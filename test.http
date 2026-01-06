@@ -1,10 +1,53 @@
+@JWT_A =eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY3NjYzMDU4LCJleHAiOjE3Njc2NjY2NTh9.dCihA-ejX8yekUirx3wjQpNBfnYCvo2PcR8MUOFZJuY
+@NOTE_ID = 1
+@JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY3NjYzMjE4LCJleHAiOjE3Njc2NjY4MTh9.6HMMm3BTwZqc9TpKBwuZKU4bKT7YIeLyOnyrxh84MEs
+### Register User A
 POST http://localhost:8081/auth/register
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "password": "password123"
+  "email": "a@test.com",
+  "password": "password"
 }
 
+### Login User A
+POST http://localhost:8081/auth/login
+Content-Type: application/json
 
+{
+  "email": "a@test.com",
+  "password": "password"
+}
 
+### Me (User A)
+GET http://localhost:8081/me
+Authorization: Bearer {{JWT_A}}
+
+### Create note (User A)
+POST http://localhost:8081/notes
+Authorization: Bearer {{JWT_A}}
+Content-Type: text/plain
+
+note from user A
+
+### Register User B
+POST http://localhost:8081/auth/register
+Content-Type: application/json
+
+{
+  "email": "b@test.com",
+  "password": "password"
+}
+
+### Login User B
+POST http://localhost:8081/auth/login
+Content-Type: application/json
+
+{
+  "email": "b@test.com",
+  "password": "password"
+}
+
+### Ownership test (User B tries User A's note)
+GET http://localhost:8081/notes/{{NOTE_ID}}
+Authorization: Bearer {{JWT_A}}
