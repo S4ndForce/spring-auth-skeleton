@@ -1,10 +1,17 @@
 package com.example.exceptions;
 
 public class ErrorResponse {
-    private String message;
 
-    public ErrorResponse(String message) {
+    private final int status;
+    private final String message;
+
+    public ErrorResponse(int status, String message) {
+        this.status = status;
         this.message = message;
+    }
+
+    public int getStatus() {
+        return status;
     }
 
     public String getMessage() {
