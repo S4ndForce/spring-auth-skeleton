@@ -1,5 +1,5 @@
 @JWT_A =eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY3Nzg5MzI2LCJleHAiOjE3Njc3OTI5MjZ9.Xb0BpeC9f7seVXRfGZ21gmo92WrvbdHpMfvFymTFPBk
-@NOTE_ID = 2
+@NOTE_ID = 1
 @JWT_B =eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY3Nzg5MzcyLCJleHAiOjE3Njc3OTI5NzJ9.7ifNCEXQd3b2nJnXR1HQrukEcgiIePMonGqg7Tv0W6k
 ### Register User A
 POST http://localhost:8081/auth/register
@@ -50,4 +50,11 @@ Content-Type: application/json
 
 ### Ownership test
 GET http://localhost:8081/notes/{{NOTE_ID}}
-Authorization: Bearer {{JWT_B}}
+Authorization: Bearer {{JWT_A}}
+
+### Update note (User A)
+PATCH http://localhost:8081/notes/{{NOTE_ID}}
+Authorization: Bearer {{JWT_A}}
+Content-Type: text/plain
+
+updated content

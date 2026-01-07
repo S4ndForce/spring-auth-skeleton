@@ -37,4 +37,8 @@ public class Note {
     public boolean isOwnedBy(User user) {
         return this.owner.equals(user);
     }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
