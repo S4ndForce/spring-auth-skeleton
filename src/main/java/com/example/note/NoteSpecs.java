@@ -19,5 +19,8 @@ public class NoteSpecs {
                 cb.equal(root.get("folder").get("id"), folderId);
     }
 
+    public static Specification<Note> withId(Long id) {
+        return (root, query, cb) -> cb.equal(root.get("id"), id);
+    }
 
 }

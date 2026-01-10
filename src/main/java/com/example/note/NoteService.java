@@ -51,16 +51,16 @@ public class NoteService {
     public NoteResponse getById(Long id, Authentication auth) {
         User user = currentUser.get(auth);
 
-        Note note = noteRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Note not found"));
-
-        if (!note.isOwnedBy(user)) {
-            throw new ForbiddenException("Not your note");
+        boolean exists = noteRepository.existsById(id);
+        if (!exists) {
+            throw new NotFoundException("Note not found");
         }
+        Specification<Note> spec = Specification
+                .allOf(NoteSpecs.withId(id))
+                .and(NoteSpecs.belongsTo(user));
 
-        if (!note.getFolder().isOwnedBy(user)) {
-            throw new ForbiddenException("Folder does not belong to you");
-        }
+        Note note = noteRepository.findOne(spec)
+                .orElseThrow(() -> new ForbiddenException("Not your note"));
 
         return NoteResponse.fromEntity(note);
     }
@@ -74,30 +74,44 @@ public class NoteService {
                 .toList();
     }
 
-    public NoteResponse update(Long id, String content,Authentication auth){
+    public NoteResponse update(Long id, String content, Authentication auth) {
         User user = currentUser.get(auth);
-        Note note = noteRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundException("Note not found"));
 
-       if(!note.isOwnedBy(user)){
-           throw new ForbiddenException("Not your note");
-       }
 
-       note.setContent(content);
-       noteRepository.save(note);
+        if (!noteRepository.existsById(id)) {
+            throw new NotFoundException("Note not found");
+        }
 
-       return NoteResponse.fromEntity(note);
+
+        Specification<Note> spec = Specification
+                .allOf(NoteSpecs.withId(id))
+                .and(NoteSpecs.belongsTo(user));
+
+        Note note = noteRepository.findOne(spec)
+                .orElseThrow(() -> new ForbiddenException("Not your note"));
+
+
+        note.setContent(content);
+        noteRepository.save(note);
+
+        return NoteResponse.fromEntity(note);
     }
 
-    public void delete(Long id, Authentication auth){
+    public void delete(Long id, Authentication auth) {
         User user = currentUser.get(auth);
-        Note note = noteRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundException("Note not found"));
 
-        if(!note.isOwnedBy(user)){
-            throw new ForbiddenException("Not your note");
+        if (!noteRepository.existsById(id)) {
+            throw new NotFoundException("Note not found");
         }
-        noteRepository.deleteById(id);
+
+        Specification<Note> spec = Specification
+                .allOf(NoteSpecs.withId(id))
+                .and(NoteSpecs.belongsTo(user));
+
+        Note note = noteRepository.findOne(spec)
+                .orElseThrow(() -> new ForbiddenException("Not your note"));
+
+        noteRepository.delete(note);
     }
 
     public List<NoteResponse> getByFolder(Long folderId, Authentication auth) {
@@ -118,17 +132,21 @@ public class NoteService {
 
     public String createSharedLink(Long id, Authentication auth) {
         User user = currentUser.get(auth);
-        Note note = noteRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Note not found"));
 
-        if (!note.isOwnedBy(user)) {
-            throw new ForbiddenException("Not your note");
+        if (!noteRepository.existsById(id)) {
+            throw new NotFoundException("Note not found");
         }
+
+        Specification<Note> spec = Specification
+                .allOf(NoteSpecs.withId(id))
+                .and(NoteSpecs.belongsTo(user));
+
+        Note note = noteRepository.findOne(spec)
+                .orElseThrow(() -> new ForbiddenException("Not your note"));
 
         note.setVisibility(Visibility.SHARED_LINK);
 
         String token = UUID.randomUUID().toString();
-
         sharedLinkRepository.save(new SharedLink(token, note));
         noteRepository.save(note);
 
