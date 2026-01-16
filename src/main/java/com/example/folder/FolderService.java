@@ -7,6 +7,7 @@ import com.example.user.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -23,6 +24,9 @@ public class FolderService {
     public FolderResponse create(String name, Authentication auth) {
         User user = currentUser.get(auth);
         Folder folder = new Folder(name, user);
+        Instant now = Instant.now();
+        folder.setCreatedAt(now);
+        folder.setUpdatedAt(now);
         folderRepository.save(folder);
         return FolderResponse.fromEntity(folder);
     }

@@ -10,6 +10,8 @@ import com.example.shared.SharedLink;
 import com.example.shared.SharedLinkService;
 import com.example.user.User;
 import com.example.auth.CurrentUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -36,10 +38,12 @@ public class NoteService {
         this.folderRepository = folderRepository;
         this.sharedLinkService = sharedLinkService;
     }
-
+    // Helper methods
     private Specification<Note> ownedNote(Long id, User user) {
         return Specification.allOf(NoteSpecs.withId(id)).and(NoteSpecs.belongsTo(user));
     }
+
+    // Business logic
 
     public NoteResponse create(Long folderId, String content, Authentication auth) {
         User user = currentUser.get(auth);
@@ -105,8 +109,9 @@ public class NoteService {
                 .toList();
     }
 
-    // still uses classic repo logic
-    public List<NoteResponse> getMyNotes(Authentication auth) {
+    // Still uses classic repo logic
+    // Refactor later to use specifications
+    public List<NoteResponse> getMyFilteredNotes(Authentication auth) {
         User user = currentUser.get(auth);
 
         return noteRepository.findByOwner(user)
@@ -178,9 +183,10 @@ public class NoteService {
         return link.getToken();
     }
 
-    public List<NoteResponse> searchMyNotes(
+    public Page<NoteResponse> searchMyNotes(
             String text,
             Long folderId,
+            Pageable pageable,
             Authentication auth
     ) {
         User user = currentUser.get(auth);
@@ -195,11 +201,9 @@ public class NoteService {
             spec = spec.and(NoteSpecs.inFolder(folderId));
         }
 
-        List<Note> notes = noteRepository.findAll(spec);
+        Page<Note> notes = noteRepository.findAll(spec, pageable);
 
-        return notes.stream()
-                .map(NoteResponse::fromEntity)
-                .toList();
+        return notes.map(NoteResponse::fromEntity);
     }
 
 

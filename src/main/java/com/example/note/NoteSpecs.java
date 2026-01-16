@@ -13,10 +13,6 @@ public class NoteSpecs {
         return (root, query, cb) -> cb.equal(root.get("id"), id);
     }
 
-    public static Specification<Note> contentContains(String text) {
-        return (root, query, cb) ->
-                cb.like(cb.lower(root.get("content")), "%" + text.toLowerCase() + "%");
-    }
 
     // Search specs
 
@@ -24,6 +20,12 @@ public class NoteSpecs {
         return (root, query, cb) ->
                 cb.equal(root.get("folder").get("id"), folderId);
     }
+
+    public static Specification<Note> contentContains(String text) {
+        return (root, query, cb) ->
+                cb.like(cb.lower(root.get("content")), "%" + text.toLowerCase() + "%");
+    }
+
 
 
 

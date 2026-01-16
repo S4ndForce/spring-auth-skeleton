@@ -1,9 +1,9 @@
-@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY4MjIyNDE3LCJleHAiOjE3NjgyMjYwMTd9.N0JmIgOuMU2g6vNXUhn76L17eil7ig6CZb-RlC9-LBo
+@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY4NTE0MjI1LCJleHAiOjE3Njg1MTc4MjV9.iyKKM2qkrl95qgOR0mKhuFhalPaxCGH5a9u3vAujPpU
 
 @JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY4MjIyNDgyLCJleHAiOjE3NjgyMjYwODJ9.SC-7sb65KgG6pek05_tyavrlWXGC_RoCzvB_6yGSxEo
 @FOLDER_ID = 1
 @NOTE_ID = 1
-@SHARE_TOKEN = 35b3c610-2c4b-4d4c-bec6-35f7477d2022
+@SHARE_TOKEN = 289f500d-38ff-4b63-9871-3797e6eaabd8
 
 ### Register User A
 POST http://localhost:8081/auth/register
@@ -111,3 +111,6 @@ GET http://localhost:8081/shared/{{SHARE_TOKEN}}
 ### (Optional) Invalid shared token → expect 404 NotFound
 GET http://localhost:8081/shared/bad-token-xyz
 
+### Pagination test (User A) → expect PageResponse JSON
+GET http://localhost:8081/notes/search?page=0&size=2
+Authorization: Bearer {{JWT_A}}

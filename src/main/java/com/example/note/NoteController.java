@@ -1,5 +1,7 @@
 package com.example.note;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,8 +35,8 @@ public class NoteController {
     }
 
     @GetMapping
-    public List<NoteResponse> getMyNotes(Authentication auth) {
-        return noteService.getMyNotes(auth);
+    public List<NoteResponse> getMyFilteredNotes(Authentication auth) {
+        return noteService.getMyFilteredNotes(auth);
     }
 
     @PatchMapping("/{id}")
@@ -68,11 +70,12 @@ public class NoteController {
     }
 
     @GetMapping("/search")
-    public List<NoteResponse> searchMyNotes(
+    public Page<NoteResponse> search(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) Long folderId,
+            Pageable pageable,
             Authentication auth
     ) {
-        return noteService.searchMyNotes(text, folderId, auth);
+        return noteService.searchMyNotes(text, folderId, pageable, auth);
     }
 }
