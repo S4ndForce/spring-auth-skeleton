@@ -1,9 +1,8 @@
-@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY4NTE0MjI1LCJleHAiOjE3Njg1MTc4MjV9.iyKKM2qkrl95qgOR0mKhuFhalPaxCGH5a9u3vAujPpU
-
+@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY4Njg1NTg3LCJleHAiOjE3Njg2ODkxODd9.RSL0Bf-ilvra3aFGS_XNsTxaaFGi8ziKuG9UxylAm9c
 @JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY4MjIyNDgyLCJleHAiOjE3NjgyMjYwODJ9.SC-7sb65KgG6pek05_tyavrlWXGC_RoCzvB_6yGSxEo
 @FOLDER_ID = 1
 @NOTE_ID = 1
-@SHARE_TOKEN = 289f500d-38ff-4b63-9871-3797e6eaabd8
+@SHARE_TOKEN = 9e6137df-dcbd-4e5a-92e0-3139cc2a4bbc
 
 ### Register User A
 POST http://localhost:8081/auth/register

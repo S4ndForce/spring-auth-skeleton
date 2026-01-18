@@ -1,8 +1,6 @@
 package com.example.auth;
 
 import com.example.security.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,13 +12,17 @@ public class AuthController {
 
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthService authService, AuthenticationManager authenticationManager) {
+    public AuthController(
+            AuthService authService,
+            AuthenticationManager authenticationManager,
+            JwtUtil jwtUtil
+    ) {
         this.authService = authService;
         this.authenticationManager = authenticationManager;
-
+        this.jwtUtil = jwtUtil;
     }
-
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -35,7 +37,6 @@ public class AuthController {
                         request.email, request.password
                 )
         );
-        return JwtUtil.generateToken(request.email);
+        return jwtUtil.generateToken(request.email);
     }
-
 }

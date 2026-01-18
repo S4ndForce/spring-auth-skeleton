@@ -1,0 +1,32 @@
+
+services:
+  app:
+    build: .
+    container_name: notes-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/notesdb
+      DB_USER: notes
+      DB_PASSWORD: notes
+      PORT: 8081
+      JWT_SECRET: "THIS_IS_A_REALLY_LONG_AND_SECURE_TEST_SECRET_123456789"
+      JWT_EXPIRATION: 3600000
+
+  db:
+    image: postgres:16
+    container_name: notes-db
+    environment:
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+      POSTGRES_DB: notesdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

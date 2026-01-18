@@ -4,11 +4,19 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Collections;
 
+@Component
 public class JwtAuthenticationFilter implements Filter {
+
+    private final JwtUtil jwtUtil;
+
+    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public void doFilter(
@@ -20,7 +28,7 @@ public class JwtAuthenticationFilter implements Filter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            String email = JwtUtil.validateAndGetEmail(token);
+            String email = jwtUtil.validateAndGetEmail(token);
 
             var auth = new UsernamePasswordAuthenticationToken(
                     email, null, Collections.emptyList()
