@@ -13,6 +13,12 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       PORT: 8081
 
+    healthcheck:
+        test: [ "CMD", "curl", "-f", "http://localhost:8081/ready" ]
+        interval: 20s
+        timeout: 5s
+        retries: 3
+
   db:
     image: postgres:16
     container_name: notes-db
@@ -27,3 +33,5 @@ services:
 
 volumes:
   postgres_data:
+
+
