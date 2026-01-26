@@ -46,12 +46,20 @@ public class NoteService {
         this.tagRepository = tagRepository;
     }
     // Helper methods
-    private Specification<Note> ownedNote(Long id, User user) {
+    private Specification<Note> ownedActive(Long id, User user) {
         return Specification
                 .allOf(NoteSpecs.withId(id))
                 .and(NoteSpecs.belongsTo(user))
                 .and(NoteSpecs.notDeleted());
     }
+
+    private Specification<Note> ownedDeleted(Long id, User user) {
+        return Specification
+                .allOf(NoteSpecs.withId(id))
+                .and(NoteSpecs.belongsTo(user));
+
+    }
+
 
     // Business logic
 
@@ -80,16 +88,12 @@ public class NoteService {
     public NoteResponse getById(Long id, Authentication auth) {
         User user = currentUser.get(auth);
 
-        boolean exists = noteRepository.existsById(id);
-        if (!exists) {
-            throw new NotFoundException("Note not found");
-        }
         Specification<Note> spec = Specification
                 .allOf(NoteSpecs.withId(id))
                 .and(NoteSpecs.belongsTo(user));
 
         Note note = noteRepository.findOne(spec)
-                .orElseThrow(() -> new ForbiddenException("Not your note"));
+                .orElseThrow(() -> new NotFoundException("Note not found"));
 
         return NoteResponse.fromEntity(note);
     }
@@ -97,19 +101,16 @@ public class NoteService {
     public List<NoteResponse> getByFolder(Long folderId, Authentication auth) {
         User user = currentUser.get(auth);
 
-        boolean exists = folderRepository.existsById(folderId);
-        if (!exists) {
-            throw new NotFoundException("Folder not found");
-        }
+
 
         Specification<Folder> folderSpec = Specification
                 .allOf(FolderSpecs.withId(folderId))
                 .and(FolderSpecs.belongsTo(user));
 
         Folder folder = folderRepository.findOne(folderSpec)
-                .orElseThrow(() -> new ForbiddenException("Not your folder"));
+                .orElseThrow(() -> new NotFoundException("Not your folder"));
 
-        Specification<Note> noteSpec = ownedNote(folderId, user);
+        Specification<Note> noteSpec = ownedActive(folderId, user);
 
         List<Note> notes = noteRepository.findAll(noteSpec);
 
@@ -133,15 +134,11 @@ public class NoteService {
         User user = currentUser.get(auth);
 
 
-        if (!noteRepository.existsById(id)) {
-            throw new NotFoundException("Note not found");
-        }
 
-
-        Specification<Note> spec = ownedNote(id,user);
+        Specification<Note> spec = ownedActive(id,user);
 
         Note note = noteRepository.findOne(spec)
-                .orElseThrow(() -> new ForbiddenException("Not your note"));
+                .orElseThrow(() -> new NotFoundException("Note not found"));
 
 
         note.setContent(content);
@@ -155,7 +152,7 @@ public class NoteService {
 
         User user = currentUser.get(auth);
 
-        Specification<Note> spec = ownedNote(id, user);
+        Specification<Note> spec = ownedActive(id, user);
 
         Note note = noteRepository.findOne(spec)
                 .orElseThrow(() -> new NotFoundException("Note not found"));
@@ -169,14 +166,11 @@ public class NoteService {
     public String createSharedLink(Long id, Authentication auth) {
         User user = currentUser.get(auth);
 
-        if (!noteRepository.existsById(id)) {
-            throw new NotFoundException("Note not found");
-        }
 
-        Specification<Note> spec = ownedNote(id, user);
+        Specification<Note> spec = ownedActive(id, user);
 
         Note note = noteRepository.findOne(spec)
-                .orElseThrow(() -> new ForbiddenException("Not your note"));
+                .orElseThrow(() -> new NotFoundException("Note not found"));
 
         note.setVisibility(Visibility.SHARED_LINK);
         noteRepository.save(note);
@@ -190,6 +184,7 @@ public class NoteService {
         return link.getToken();
     }
 
+    //
     public PageResponse<NoteResponse> searchMyNotes(
             String text,
             Long folderId,
@@ -232,8 +227,9 @@ public class NoteService {
     public NoteResponse addTags(Long noteId, Set<String> names, Authentication auth) {
         User user = currentUser.get(auth);
 
-        Specification<Note> spec = ownedNote(noteId, user);
-        Note note = noteRepository.findOne(spec).orElseThrow(() -> new ForbiddenException("Not your note"));
+        Specification<Note> spec = ownedActive(noteId, user);
+        Note note = noteRepository.findOne(spec)
+                .orElseThrow(() -> new NotFoundException("Note not found"));
 
         Set<Tag> tagSet = names.stream()
                 .map(n -> tagRepository.findByName(n).orElseGet(() -> tagRepository.save(new Tag(n))))
@@ -250,8 +246,9 @@ public class NoteService {
     public NoteResponse removeTag(Long noteId, String name, Authentication auth) {
         User user = currentUser.get(auth);
 
-        Specification<Note> spec = ownedNote(noteId, user);
-        Note note = noteRepository.findOne(spec).orElseThrow(() -> new ForbiddenException("Not your note"));
+        Specification<Note> spec = ownedActive(noteId, user);
+        Note note = noteRepository.findOne(spec)
+                .orElseThrow(() -> new NotFoundException("Note not found"));
 
         tagRepository.findByName(name).ifPresent(t -> note.getTags().remove(t));
         note.setUpdatedAt(Instant.now());
@@ -263,12 +260,10 @@ public class NoteService {
     public void restore(Long id, Authentication auth) {
         User user = currentUser.get(auth);
 
-        Specification<Note> spec = Specification
-                .allOf(NoteSpecs.withId(id))
-                .and(NoteSpecs.belongsTo(user));
+        Specification<Note> spec = ownedDeleted(id, user);
 
         Note note = noteRepository.findOne(spec)
-                .orElseThrow(() -> new ForbiddenException("Not your note"));
+                .orElseThrow(() -> new NotFoundException("Note not found"));
 
         note.setDeletedAt(null);
         note.setUpdatedAt(Instant.now());

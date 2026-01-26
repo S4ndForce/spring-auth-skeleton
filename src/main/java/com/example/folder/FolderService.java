@@ -3,7 +3,11 @@ package com.example.folder;
 import com.example.auth.CurrentUser;
 import com.example.exceptions.ForbiddenException;
 import com.example.exceptions.NotFoundException;
+import com.example.note.Note;
+import com.example.note.NoteSpecs;
 import com.example.user.User;
+import org.aspectj.weaver.ast.Not;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +19,12 @@ public class FolderService {
 
     private final FolderRepository folderRepository;
     private final CurrentUser currentUser;
+
+    private Specification<Folder> ownedFolder(Long id, User user) {
+        return Specification
+                .allOf(FolderSpecs.withId(id))
+                .and(FolderSpecs.belongsTo(user));
+    }
 
     public FolderService(FolderRepository folderRepository, CurrentUser currentUser) {
         this.folderRepository = folderRepository;
@@ -31,6 +41,7 @@ public class FolderService {
         return FolderResponse.fromEntity(folder);
     }
 
+    // No pagination on folders
     public List<FolderResponse> getMyFolders(Authentication auth) {
         User user = currentUser.get(auth);
         return folderRepository.findByOwner(user)
@@ -41,24 +52,22 @@ public class FolderService {
 
     public FolderResponse getById(Long id, Authentication auth) {
         User user = currentUser.get(auth);
-        Folder folder = folderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Folder not found"));
 
-        if (!folder.isOwnedBy(user)) {
-            throw new ForbiddenException("Not your folder");
-        }
+        Specification<Folder> spec = ownedFolder(id, user);
+
+        Folder folder = folderRepository.findOne(spec)
+                .orElseThrow(() -> new NotFoundException("Folder not found"));
 
         return FolderResponse.fromEntity(folder);
     }
 
     public FolderResponse update(Long id, String name, Authentication auth) {
         User user = currentUser.get(auth);
-        Folder folder = folderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Folder not found"));
 
-        if (!folder.isOwnedBy(user)) {
-            throw new ForbiddenException("Not your folder");
-        }
+        Specification<Folder> spec = ownedFolder(id, user);
+
+        Folder folder = folderRepository.findOne(spec)
+                .orElseThrow(() -> new NotFoundException("Folder not found"));
 
         folder.setName(name);
         folderRepository.save(folder);
@@ -67,12 +76,10 @@ public class FolderService {
 
     public void delete(Long id, Authentication auth) {
         User user = currentUser.get(auth);
-        Folder folder = folderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Folder not found"));
+        Specification<Folder> spec = ownedFolder(id, user);
 
-        if (!folder.isOwnedBy(user)) {
-            throw new ForbiddenException("Not your folder");
-        }
+        Folder folder = folderRepository.findOne(spec)
+                .orElseThrow(() -> new NotFoundException("Folder not found"));
 
         folderRepository.deleteById(id);
     }
