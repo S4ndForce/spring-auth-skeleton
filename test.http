@@ -1,5 +1,5 @@
-@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY5MTA5NTE4LCJleHAiOjE3NjkxMTMxMTh9.Qeuri5dgeF7fbXxb6WQmkz_4WxKX52-YNPbELrP48IU
-@JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY4MjIyNDgyLCJleHAiOjE3NjgyMjYwODJ9.SC-7sb65KgG6pek05_tyavrlWXGC_RoCzvB_6yGSxEo
+@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY5NTM5ODE3LCJleHAiOjE3Njk1NDM0MTd9.B5DmgBYmx71nDWtSKdKFti7PWeC3OmLqAhfd20J9lrc
+@JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY5NTM4NTcyLCJleHAiOjE3Njk1NDIxNzJ9.nm-Py7o9YYwXPEko_KitmDW0l0pbkJH0ZnrmCGgtzoM
 @FOLDER_ID = 1
 @NOTE_ID = 1
 @SHARE_TOKEN = e5435159-2cf7-4337-b6a3-54c625e5c52e
@@ -100,6 +100,15 @@ hacked content
 ### (New) Share Note (User A) → returns token, copy to {{SHARE_TOKEN}}
 POST http://localhost:8081/notes/{{NOTE_ID}}/share
 Authorization: Bearer {{JWT_A}}
+
+###
+
+###
+POST http://localhost:8081/notes/{{NOTE_ID}}/tags
+Authorization: Bearer {{JWT_A}}
+Content-Type: application/json
+
+["school"]
 
 ###
 

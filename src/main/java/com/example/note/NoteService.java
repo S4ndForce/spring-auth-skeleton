@@ -59,6 +59,12 @@ public class NoteService {
                 .and(NoteSpecs.belongsTo(user));
 
     }
+    private Specification<Note> ownedActiveInFolder(Long folderId, User user) {
+        return Specification
+                .allOf(NoteSpecs.inFolder(folderId))
+                .and(NoteSpecs.belongsTo(user))
+                .and(NoteSpecs.notDeleted());
+    }
 
 
     // Business logic
@@ -110,7 +116,7 @@ public class NoteService {
         Folder folder = folderRepository.findOne(folderSpec)
                 .orElseThrow(() -> new NotFoundException("Not your folder"));
 
-        Specification<Note> noteSpec = ownedActive(folderId, user);
+        Specification<Note> noteSpec = ownedActiveInFolder(folderId, user);
 
         List<Note> notes = noteRepository.findAll(noteSpec);
 
@@ -231,6 +237,7 @@ public class NoteService {
         Note note = noteRepository.findOne(spec)
                 .orElseThrow(() -> new NotFoundException("Note not found"));
 
+        // Normalization
         Set<Tag> tagSet = names.stream()
                 .map(n -> tagRepository.findByName(n).orElseGet(() -> tagRepository.save(new Tag(n))))
                 .collect(Collectors.toSet());
