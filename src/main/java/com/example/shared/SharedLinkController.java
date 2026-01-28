@@ -21,4 +21,12 @@ public class SharedLinkController {
     public NoteResponse getShared(@PathVariable String token) {
         return sharedLinkService.getNote(token);
     }
+
+    @PatchMapping("/{token}")
+    public NoteResponse update(
+            @PathVariable String token,
+            @RequestBody SharedLinkUpdateRequest request
+    ) {
+        return sharedLinkService.updateViaSharedLink(token, request);
+    }
 }

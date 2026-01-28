@@ -4,6 +4,7 @@ import com.example.exceptions.ForbiddenException;
 import com.example.exceptions.NotFoundException;
 import com.example.note.Note;
 import com.example.note.NoteResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -63,10 +64,21 @@ public class SharedLinkService {
     }
 
     public NoteResponse getNote(String token) {
-        SharedLink link = repository.findByToken(token)
-                .orElseThrow(() -> new NotFoundException("Invalid link"));
+        SharedLink link = validate(token, SharedAction.READ);
+        return NoteResponse.fromEntity(link.getNote());
+    }
 
+    @Transactional
+    public NoteResponse updateViaSharedLink(String token, SharedLinkUpdateRequest request) {
+        SharedLink link = validate(token, SharedAction.UPDATE);
         Note note = link.getNote();
+
+
+        if (request.content() != null) {
+            note.setContent(request.content());
+            note.setUpdatedAt(Instant.now());
+        }
+
         return NoteResponse.fromEntity(note);
     }
 }
