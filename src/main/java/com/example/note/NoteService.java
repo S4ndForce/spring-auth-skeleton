@@ -66,9 +66,14 @@ public class NoteService {
                 .and(NoteSpecs.notDeleted());
     }
 
+    private Specification<Note> allActive(User user) {
+        return Specification
+                .allOf(NoteSpecs.belongsTo(user))
+                .and(NoteSpecs.notDeleted());
+    }
+
 
     // Business logic
-
     public NoteResponse create(Long folderId, String content, Authentication auth) {
         User user = currentUser.get(auth);
 
@@ -94,10 +99,7 @@ public class NoteService {
     public NoteResponse getById(Long id, Authentication auth) {
         User user = currentUser.get(auth);
 
-        Specification<Note> spec = Specification
-                .allOf(NoteSpecs.withId(id))
-                .and(NoteSpecs.belongsTo(user));
-
+        Specification<Note> spec = ownedActive(id, user);
         Note note = noteRepository.findOne(spec)
                 .orElseThrow(() -> new NotFoundException("Note not found"));
 
@@ -200,9 +202,7 @@ public class NoteService {
     ) {
         User user = currentUser.get(auth);
 
-        Specification<Note> spec = Specification
-                .allOf(NoteSpecs.belongsTo(user))
-                .and(NoteSpecs.notDeleted());
+        Specification<Note> spec = allActive(user);
 
         if (text != null && !text.isBlank()) {
             spec = spec.and(NoteSpecs.contentContains(text));

@@ -22,7 +22,7 @@ public class SoftDeleteCleanupJob {
         this.notes = notes;
     }
     @Transactional
-    @Scheduled(cron = "0 0 * * * *") // every hour
+    @Scheduled(fixedDelay = 60_000) // every minute
     public void purgeDeletedNotes() {
         MDC.put("traceId", UUID.randomUUID().toString().substring(0, 8));
         try {

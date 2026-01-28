@@ -1,5 +1,5 @@
-@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY5NTM5ODE3LCJleHAiOjE3Njk1NDM0MTd9.B5DmgBYmx71nDWtSKdKFti7PWeC3OmLqAhfd20J9lrc
-@JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY5NTM4NTcyLCJleHAiOjE3Njk1NDIxNzJ9.nm-Py7o9YYwXPEko_KitmDW0l0pbkJH0ZnrmCGgtzoM
+@JWT_A = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwiaWF0IjoxNzY5NjA5NDIyLCJleHAiOjE3Njk2MTMwMjJ9.NPoBR07maasofgusRp-mSpLNeEow68JPxB989IB9NeA
+@JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiQHRlc3QuY29tIiwiaWF0IjoxNzY5NjA5NDk0LCJleHAiOjE3Njk2MTMwOTR9.0Rudblu0xg0BxQ2LIjNEFFUwiPQskkqoBXycOrR-FK4
 @FOLDER_ID = 1
 @NOTE_ID = 1
 @SHARE_TOKEN = e5435159-2cf7-4337-b6a3-54c625e5c52e
@@ -88,6 +88,19 @@ Authorization: Bearer {{JWT_B}}
 
 ###
 
+### Ownership test: User B tries to GET User A’s note → expect 403 Forbidden
+GET http://localhost:8081/notes/{{NOTE_ID}}
+Authorization: Bearer {{JWT_A}}
+
+###
+
+### test soft delete
+DELETE http://localhost:8081/notes/{{NOTE_ID}}
+Authorization: Bearer {{JWT_A}}
+
+###
+
+
 ### Ownership test: User B tries to PATCH → expect 403 Forbidden
 PATCH http://localhost:8081/notes/{{NOTE_ID}}
 Authorization: Bearer {{JWT_B}}
@@ -99,6 +112,12 @@ hacked content
 
 ### (New) Share Note (User A) → returns token, copy to {{SHARE_TOKEN}}
 POST http://localhost:8081/notes/{{NOTE_ID}}/share
+Authorization: Bearer {{JWT_A}}
+
+###
+
+### (New) Share Note (User A) → returns token, copy to {{SHARE_TOKEN}}
+POST http://localhost:8081/notes/{{NOTE_ID}}/restore
 Authorization: Bearer {{JWT_A}}
 
 ###

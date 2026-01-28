@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.dao.TransientDataAccessException;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -45,7 +46,13 @@ public class SharedLinkCleanupJob {
             if (deleted > 0) {
                 log.info("Cleanup shared links: deleted={}", deleted);
             }
-        } finally {
+        } catch (BadSqlGrammarException e) {
+            log.warn(
+                    "SharedLinkCleanup skipped: shared_link table not present (dev environment)"
+            );
+        }
+        // swallow and exit
+        finally {
             MDC.clear();
         }
     }

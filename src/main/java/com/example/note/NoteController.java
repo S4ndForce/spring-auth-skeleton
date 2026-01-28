@@ -34,6 +34,7 @@ public class NoteController {
     public NoteResponse get(@PathVariable Long id, Authentication auth) {
 
         return noteService.getById(id, auth);
+
     }
 
     @GetMapping
