@@ -19,11 +19,12 @@ public class FolderController {
     public FolderResponse create(@RequestBody String name, Authentication auth) {
         return folderService.create(name, auth);
     }
-
+    /*
     @GetMapping
     public List<FolderResponse> getMyFolders(Authentication auth) {
         return folderService.getMyFolders(auth);
     }
+    */
 
     @GetMapping("/{id}")
     public FolderResponse get(@PathVariable Long id, Authentication auth) {
@@ -39,4 +40,6 @@ public class FolderController {
     public void delete(@PathVariable Long id, Authentication auth) {
         folderService.delete(id, auth);
     }
+
+
 }

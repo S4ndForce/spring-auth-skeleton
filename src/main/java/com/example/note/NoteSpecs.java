@@ -40,6 +40,16 @@ public class NoteSpecs {
                 cb.isNull(root.get("deletedAt"));
     }
 
+    public static Specification<Note> isDeleted() {
+        return (root, query, cb) ->
+                cb.isNotNull(root.get("deletedAt"));
+    }
+
+    public static Specification<Note> folderNotDeleted() {
+        return (root, query, cb) ->
+                cb.isNull(root.get("folder").get("deletedAt"));
+    }
+
 
 
 }

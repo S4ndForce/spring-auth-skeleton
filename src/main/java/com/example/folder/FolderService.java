@@ -6,6 +6,7 @@ import com.example.auth.OwnerAuthorization;
 import com.example.exceptions.NotFoundException;
 import com.example.note.Note;
 import com.example.note.NoteRepository;
+import com.example.note.NoteSpecs;
 import com.example.user.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.domain.Specification;
@@ -92,29 +93,61 @@ public class FolderService {
     }
 
 
+    @Transactional
     public void delete(Long id, Authentication auth) {
         User user = currentUser.get(auth);
+
         Specification<Folder> spec = ownedActiveFolder(id, user);
         ownedAuth.authorize(OwnerAction.DELETE);
+
         Folder folder = folderRepository.findOne(spec)
                 .orElseThrow(() -> new NotFoundException("Folder not found"));
-        folder.setDeletedAt(Instant.now());
+
+        Instant now = Instant.now();
+
+        // 1. Soft-delete folder
+        folder.setDeletedAt(now);
+
+        // 2. Cascade soft-delete notes
+        List<Note> notes = noteRepository.findAll(
+                NoteSpecs.inFolder(folder.getId())
+                        .and(NoteSpecs.notDeleted())
+        );
+
+        for (Note note : notes) {
+            note.setDeletedAt(now);
+            note.setUpdatedAt(now);
+        }
+
         folderRepository.save(folder);
-
-
     }
 
+
+    @Transactional
     public void restore(Long id, Authentication auth) {
         User user = currentUser.get(auth);
 
         Specification<Folder> spec = ownedDeletedFolder(id, user);
+        ownedAuth.authorize(OwnerAction.UPDATE);
 
         Folder folder = folderRepository.findOne(spec)
-                .orElseThrow(() -> new NotFoundException("Note not found"));
-        ownedAuth.authorize(OwnerAction.UPDATE);
+                .orElseThrow(() -> new NotFoundException("Folder not found"));
+
+        Instant now = Instant.now();
+
         folder.setDeletedAt(null);
-        folder.setUpdatedAt(Instant.now());
+        folder.setUpdatedAt(now);
+
+        List<Note> notes = noteRepository.findAll(
+                NoteSpecs.inFolder(folder.getId())
+                        .and(NoteSpecs.isDeleted())
+        );
+
+        for (Note note : notes) {
+            note.setDeletedAt(null);
+            note.setUpdatedAt(now);
+        }
+
         folderRepository.save(folder);
     }
-
 }

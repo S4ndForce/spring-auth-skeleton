@@ -62,7 +62,8 @@ public class NoteService {
     private Specification<Note> ownedDeleted(Long id, User user) {
         return Specification
                 .allOf(NoteSpecs.withId(id))
-                .and(NoteSpecs.belongsTo(user));
+                .and(NoteSpecs.belongsTo(user))
+                .and(NoteSpecs.folderNotDeleted());
 
     }
     private Specification<Note> ownedActiveInFolder(Long folderId, User user) {
