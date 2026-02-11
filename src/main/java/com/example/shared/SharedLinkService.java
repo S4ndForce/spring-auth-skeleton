@@ -48,6 +48,9 @@ public class SharedLinkService {
         if (link.getNote().getDeletedAt() != null) {
             throw new ForbiddenException("Note deleted");
         }
+        if (link.getNote().getFolder().getDeletedAt() != null) {
+            throw new ForbiddenException("Note's folder deleted");
+        }
 
         return link;
     }
