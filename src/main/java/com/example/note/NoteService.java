@@ -214,8 +214,6 @@ public class NoteService {
                 Instant.now().plusSeconds(60) // add configurability later
         );
 
-        log.debug("Creating shared link for note={} user={}", id, user.getEmail());
-
         return link.getToken();
     }
 

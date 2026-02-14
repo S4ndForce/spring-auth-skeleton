@@ -30,6 +30,8 @@ public class SharedLinkService {
     public SharedLink create(Note note, Set<SharedAction> actions, User creator, Instant expiresAt) {
         String token = UUID.randomUUID().toString();
         SharedLink link = new SharedLink(token, note, creator, actions, expiresAt);
+        log.info("Shared link created: creator={}, id={}, time={}",
+                link.getCreator().getEmail(), link.getId(), Instant.now());
         return sharedLinkRepository.save(link);
     }
 
