@@ -1,8 +1,11 @@
 package com.example.note;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -66,10 +69,16 @@ public class NoteController {
     ) {
         return noteService.getByFolder(folderId, auth);
     }
-
+    //TODO: copy this pattern to all create methods
     @PostMapping("/{id}/share")
-    public String share(@PathVariable Long id, @RequestParam Long expiration, Authentication auth) {
-        return noteService.createSharedLink(id, expiration, auth);
+    public ResponseEntity<String> share(@PathVariable Long id,
+                        @Valid @RequestBody CreateSharedLinkRequest request,
+                        Authentication auth) {
+        String token = noteService.createSharedLink(
+                id,
+                request.expiresInSeconds(),
+                auth);
+        return ResponseEntity.status(HttpStatus.CREATED).body(token);
     }
 
     @GetMapping("/search")
@@ -105,5 +114,14 @@ public class NoteController {
     @PostMapping("/{id}/restore")
     public void restore(@PathVariable Long id, Authentication auth) {
         noteService.restore(id, auth);
+    }
+
+    @GetMapping("/shared")
+    public PageResponse<NoteResponse> getAllShared(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable,
+            Authentication auth
+    ){
+        return noteService.getAllShared(pageable, auth);
     }
 }

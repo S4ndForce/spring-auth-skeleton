@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -215,6 +216,22 @@ public class NoteService {
         );
 
         return link.getToken();
+    }
+
+    public PageResponse<NoteResponse> getAllShared(Pageable pageable, Authentication auth){
+        Specification<Note> spec = Specification.allOf(NoteSpecs.hasSharedLinks());
+        Page<Note> sharedNotes = noteRepository.findAll(spec, pageable);
+
+        ownedAuth.authorize(OwnerAction.READ);
+        var content = sharedNotes.map(NoteResponse::fromEntity).toList();
+
+        return new PageResponse<NoteResponse>(
+                content,
+                sharedNotes.getNumber(),
+                sharedNotes.getSize(),
+                sharedNotes.getTotalElements(),
+                sharedNotes.getTotalPages()
+        );
     }
 
 

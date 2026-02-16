@@ -1,9 +1,8 @@
-@JWT_A =eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwianRpIjoiNWYyNDYwMzctMTlkNi00NWQ3LWFjZTktNDA4ODI4NjJhNzUwIiwiaWF0IjoxNzcxMTAzOTc0LCJleHAiOjE3NzExMzk5NzR9._AwDDJBpy_5NFVXBtrilOinIoa5N1-2tfIBeYeObEjg
-
+@JWT_A =eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwianRpIjoiMDhiY2ZjNmMtZjc4ZC00ZWI3LWEwY2YtNmU5MmNmYzUyYjEzIiwiaWF0IjoxNzcxMjc5MTcwLCJleHAiOjE3NzEzMTUxNzB9.RxgxBV44N5WVInPI1MKGbrw3OSc8zqnLK7jD4sLYYWc
 @JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwianRpIjoiZTdhOTdhMDUtNmEzNy00MDM1LWI5ZjUtODdjYzgyNDMyZDdhIiwiaWF0IjoxNzcwODM2MDA3LCJleHAiOjE3NzA4NzIwMDd9.ZjYqTljFmCTCtbkUDO3ydTLEDpWZrIqHBzI0Mn82bEQ
 @FOLDER_ID = 1
 @NOTE_ID = 1
-@SHARE_TOKEN = f8521334-a690-485b-97c2-00876b535d9a
+@SHARE_TOKEN = 306c2bf9-8c87-42b0-8a90-1e716fa13b58
 
 ### Register User A
 POST http://localhost:8081/auth/register
@@ -130,14 +129,24 @@ hacked content
 
 ###
 
-### (New) Share Note (User A) → returns token, copy to {{SHARE_TOKEN}}
-POST http://localhost:8081/notes/{{NOTE_ID}}/share
+###
+POST http://localhost:8081/notes/4/share
+Authorization: Bearer {{JWT_A}}
+Content-Type: application/json
+
+{
+"expiresInHours": 100
+}
+###
+
+###
+GET http://localhost:8081/notes/shared
 Authorization: Bearer {{JWT_A}}
 
 ###
 
 ### (New) Share Note (User A) → returns token, copy to {{SHARE_TOKEN}}
-POST http://localhost:8081/notes/{{NOTE_ID}}/restore
+POST http://localhost:8081/notes/2/restore
 Authorization: Bearer {{JWT_A}}
 
 ###

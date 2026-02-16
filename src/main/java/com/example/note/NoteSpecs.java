@@ -1,9 +1,12 @@
 package com.example.note;
 
+import com.example.shared.SharedLink;
 import com.example.tag.Tag;
 import com.example.user.User;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 public class NoteSpecs {
@@ -50,6 +53,17 @@ public class NoteSpecs {
                 cb.isNull(root.get("folder").get("deletedAt"));
     }
 
+    public static Specification<Note> hasSharedLinks() {
+        return (root, query, cb) -> {
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<SharedLink> subRoot = subquery.from(SharedLink.class);
+
+            subquery.select(subRoot.get("note").get("id"))
+                    .where(cb.equal(subRoot.get("note"), root));
+
+            return cb.exists(subquery);
+        };
+    }
 
 
 }
