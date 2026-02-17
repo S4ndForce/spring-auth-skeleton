@@ -86,6 +86,7 @@ public class NoteService {
                 .and(NoteSpecs.folderNotDeleted());
 
     }
+
     /* ---------------------------------------------------------------------------------------------------*/
 
     // Business logic
@@ -124,7 +125,8 @@ public class NoteService {
 
         Specification<Folder> folderSpec = Specification
                 .allOf(FolderSpecs.withId(folderId))
-                .and(FolderSpecs.belongsTo(user));
+                .and(FolderSpecs.belongsTo(user))
+                .and(FolderSpecs.notDeleted());
 
         Folder folder = folderRepository.findOne(folderSpec)
                 .orElseThrow(() -> new NotFoundException("Not your folder"));
@@ -138,15 +140,22 @@ public class NoteService {
                 .toList();
     }
 
-    // Still uses classic repo logic
-    // Refactor later to use specifications
-    public List<NoteResponse> getMyFilteredNotes(Authentication auth) {
+
+    public PageResponse<NoteResponse> getMyFilteredNotes(Pageable pageable, Authentication auth) {
         User user = currentUser.get(auth);
         ownedAuth.authorize(OwnerAction.READ);
-        return noteRepository.findByOwner(user)
-                .stream()
-                .map(NoteResponse::fromEntity)
-                .toList();
+        Specification<Note> spec = allActive(user);
+
+        Page<Note> notes = noteRepository.findAll(spec, pageable);
+        ownedAuth.authorize(OwnerAction.READ);
+        var content = notes.map(NoteResponse::fromEntity).toList();
+        return new PageResponse<NoteResponse>(
+                content,
+                notes.getNumber(),
+                notes.getSize(),
+                notes.getTotalElements(),
+                notes.getTotalPages()
+        );
     }
 
     public NoteResponse update(Long id, String content, Authentication auth) {

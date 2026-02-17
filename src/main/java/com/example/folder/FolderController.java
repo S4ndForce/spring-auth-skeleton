@@ -22,12 +22,12 @@ public class FolderController {
         FolderResponse folder = folderService.create(name, auth);
         return ResponseEntity.status(HttpStatus.CREATED).body(folder);
     }
-    /*
+
     @GetMapping
     public List<FolderResponse> getMyFolders(Authentication auth) {
         return folderService.getMyFolders(auth);
     }
-    */
+
 
     @GetMapping("/{id}")
     public FolderResponse get(@PathVariable Long id, Authentication auth) {

@@ -23,7 +23,8 @@ public class FolderService {
     private final CurrentUser currentUser;
     private final NoteRepository noteRepository;
     private final OwnerAuthorization ownedAuth;
-
+    // Helper Specs
+    /* ---------------------------------------------------------------------------------------------------*/
     private Specification<Folder> ownedActiveFolder(Long id, User user) {
         return Specification
                 .allOf(FolderSpecs.withId(id))
@@ -37,6 +38,13 @@ public class FolderService {
                 .and(FolderSpecs.belongsTo(user));
         // intentionally omits notDeleted() - targets soft-deleted folders only
     }
+
+    private Specification<Folder> allActive(User user) {
+        return Specification
+                .allOf(FolderSpecs.belongsTo(user))
+                .and(FolderSpecs.notDeleted());
+    }
+    /* ---------------------------------------------------------------------------------------------------*/
 
     public FolderService(FolderRepository folderRepository, CurrentUser currentUser, NoteRepository noteRepository, OwnerAuthorization ownedAuth) {
         this.folderRepository = folderRepository;
@@ -56,18 +64,16 @@ public class FolderService {
         return FolderResponse.fromEntity(folder);
     }
 
-    // Temporary comment: method returns unspecified folders.
-    /*
     public List<FolderResponse> getMyFolders(Authentication auth) {
         User user = currentUser.get(auth);
-        ownedAuth.authorize(OwnerAction.READ);
-        return folderRepository.findByOwner(user)
-                .stream()
+        Specification<Folder> spec = allActive(user);
+        List<Folder> folders = folderRepository.findAll(spec);
+                return folders.stream()
                 .map(FolderResponse::fromEntity)
                 .toList();
+
     }
 
-    */
 
     public FolderResponse getById(Long id, Authentication auth) {
         User user = currentUser.get(auth);

@@ -42,8 +42,11 @@ public class NoteController {
     }
 
     @GetMapping
-    public List<NoteResponse> getMyFilteredNotes(Authentication auth) {
-        return noteService.getMyFilteredNotes(auth);
+    public PageResponse<NoteResponse> getMyFilteredNotes(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable,
+            Authentication auth) {
+        return noteService.getMyFilteredNotes(pageable, auth);
     }
 
     @PatchMapping("/{id}")
