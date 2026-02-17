@@ -1,4 +1,4 @@
-@JWT_A =eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwianRpIjoiMDhiY2ZjNmMtZjc4ZC00ZWI3LWEwY2YtNmU5MmNmYzUyYjEzIiwiaWF0IjoxNzcxMjc5MTcwLCJleHAiOjE3NzEzMTUxNzB9.RxgxBV44N5WVInPI1MKGbrw3OSc8zqnLK7jD4sLYYWc
+@JWT_A =eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwianRpIjoiNTczMGU4YTEtYzAwMS00NWYzLWFiMjMtNGY5NTM3ZDdjYjRiIiwiaWF0IjoxNzcxMzQ0NDQzLCJleHAiOjE3NzEzODA0NDN9.hFAjDFAHDrFXEWmOrVSzTpY97TitG8dKfgaoi30QqGo
 @JWT_B = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQHRlc3QuY29tIiwianRpIjoiZTdhOTdhMDUtNmEzNy00MDM1LWI5ZjUtODdjYzgyNDMyZDdhIiwiaWF0IjoxNzcwODM2MDA3LCJleHAiOjE3NzA4NzIwMDd9.ZjYqTljFmCTCtbkUDO3ydTLEDpWZrIqHBzI0Mn82bEQ
 @FOLDER_ID = 1
 @NOTE_ID = 1
@@ -130,12 +130,12 @@ hacked content
 ###
 
 ###
-POST http://localhost:8081/notes/4/share
+POST http://localhost:8081/notes/1/share
 Authorization: Bearer {{JWT_A}}
 Content-Type: application/json
 
 {
-"expiresInHours": 100
+"expiresInSeconds": 100
 }
 ###
 

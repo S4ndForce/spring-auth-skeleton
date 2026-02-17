@@ -1,5 +1,6 @@
 package com.example.auth;
 
+import com.example.exceptions.ConflictException;
 import com.example.revoked.RevokedToken;
 import com.example.revoked.RevokedTokenRepository;
 import com.example.security.JwtUtil;
@@ -8,6 +9,7 @@ import com.example.user.User;
 import com.example.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,7 +47,12 @@ public class AuthService {
                 Role.USER
         );
 
-        userRepository.save(user);
+        // prevents race conditions
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("Email already registered");
+        }
         log.info("User registered: email={}", request.getEmail());
     }
 
@@ -65,6 +72,5 @@ public class AuthService {
         log.info("Login successful: email={}", request.getEmail());
         return jwtUtil.generateToken(request.email);
     }
-    // create handling for logout exceptions
 
 }

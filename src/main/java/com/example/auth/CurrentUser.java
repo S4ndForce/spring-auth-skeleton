@@ -1,5 +1,6 @@
 package com.example.auth;
 
+import com.example.exceptions.NotFoundException;
 import com.example.user.User;
 import com.example.user.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,6 @@ public class CurrentUser {
 
     public User get(Authentication auth) {
         return userRepository.findByEmail(auth.getName())
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

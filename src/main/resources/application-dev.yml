@@ -21,8 +21,7 @@ jwt:
   secret: dev-secret-key-should-not-be-used-in-prod
   expiration-ms: 36000000 # 1 hour
 
-  logging:
+logging:
     level:
-      org.hibernate.SQL: DEBUG
-      org.hibernate.orm.jdbc.bind: TRACE
+      org.hibernate: WARN
 

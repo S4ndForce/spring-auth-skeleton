@@ -3,9 +3,13 @@ package com.example.exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.nio.file.AccessDeniedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,7 +40,40 @@ public class GlobalExceptionHandler {
         );
     }
 
-    /*TODO: exception handling for logins:
-    any login error such as registering existing user and wrong password returns 500
-     */
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleBadCredentials(BadCredentialsException ex) {
+        log.warn("Invalid login attempt");
+        return new ErrorResponse(401, "Invalid email or password");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDenied(AccessDeniedException ex) {
+        log.warn("Access denied");
+        return new ErrorResponse(403, "Forbidden");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(err -> err.getField() + " " + err.getDefaultMessage())
+                .findFirst()
+                .orElse("Invalid request");
+
+        log.info("Validation error: {}", message);
+
+        return new ErrorResponse(400, message);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflict(ConflictException ex) {
+        log.info("Conflict: {}", ex.getMessage());
+        return new ErrorResponse(409, ex.getMessage());
+    }
+
 }
