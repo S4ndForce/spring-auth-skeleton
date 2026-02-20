@@ -1,5 +1,6 @@
 package com.example.folder;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,8 +19,8 @@ public class FolderController {
     }
 
     @PostMapping
-    public ResponseEntity<FolderResponse> create(@RequestBody String name, Authentication auth) {
-        FolderResponse folder = folderService.create(name, auth);
+    public ResponseEntity<FolderResponse> create(@Valid @RequestBody CreateFolderRequest request, Authentication auth) {
+        FolderResponse folder = folderService.create(request.name(), auth);
         return ResponseEntity.status(HttpStatus.CREATED).body(folder);
     }
 
@@ -36,8 +37,8 @@ public class FolderController {
     }
 
     @PatchMapping("/{id}")
-    public FolderResponse update(@PathVariable Long id, @RequestBody String name, Authentication auth) {
-        return folderService.update(id, name, auth);
+    public FolderResponse update(@PathVariable Long id, @Valid @RequestBody UpdateFolderRequest request, Authentication auth) {
+        return folderService.update(id, request.name(), auth);
     }
 
     @DeleteMapping("/{id}")

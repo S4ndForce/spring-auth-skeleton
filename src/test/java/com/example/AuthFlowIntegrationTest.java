@@ -88,7 +88,7 @@ public class AuthFlowIntegrationTest {
                         .contentType("application/json")
                         .content("""
                         { "email": "a@test.com",
-                          "password": "wrongPassword" }
+                          "password": "wrongOne" }
                     """))
                 .andExpect(status().isUnauthorized());
 
@@ -104,7 +104,7 @@ public class AuthFlowIntegrationTest {
     @Test
     void passwordIsHashed() throws Exception {
 
-        String rawPassword = "securePassword";
+        String rawPassword = "secure";
 
         mockMvc.perform(post("/auth/register")
                         .contentType("application/json")
@@ -139,6 +139,17 @@ public class AuthFlowIntegrationTest {
     void validLoginReturnsToken() throws Exception {
         String token = loginAndGetToken("a@test.com", "password");
         assertThat(token).isNotBlank();
+    }
+
+    @Test
+    void loginValidationWorks() throws Exception {
+        mockMvc.perform(post("/auth/login")
+                        .contentType("application/json")
+                        .content("""
+                        { "email": "a@test.com",
+                          "password": "short" }
+                    """))
+                .andExpect(status().isBadRequest());
     }
 
 }

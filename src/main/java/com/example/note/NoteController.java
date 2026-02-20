@@ -27,10 +27,10 @@ public class NoteController {
     @PostMapping
     public ResponseEntity<NoteResponse> create(
             @RequestParam Long folderId,
-            @RequestBody String content,
+            @Valid @RequestBody CreateNoteRequest request,
             Authentication auth
     ) {
-        NoteResponse note = noteService.create(folderId, content, auth);
+        NoteResponse note = noteService.create(folderId, request.content(), auth);
         return ResponseEntity.status(HttpStatus.CREATED).body(note);
     }
 
@@ -52,10 +52,10 @@ public class NoteController {
     @PatchMapping("/{id}")
     public NoteResponse update(
             @PathVariable Long id,
-            @RequestBody String content,
+            @Valid @RequestBody UpdateNoteRequest request,
             Authentication auth
     ) {
-        return noteService.update(id, content, auth);
+        return noteService.update(id, request.content(), auth);
     }
 
     @DeleteMapping("/{id}")
@@ -73,7 +73,7 @@ public class NoteController {
     ) {
         return noteService.getByFolder(folderId, auth);
     }
-    //TODO: copy this pattern to all create methods
+
     @PostMapping("/{id}/share")
     public ResponseEntity<String> share(@PathVariable Long id,
                         @Valid @RequestBody CreateSharedLinkRequest request,

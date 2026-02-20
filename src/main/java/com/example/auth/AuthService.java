@@ -39,10 +39,10 @@ public class AuthService {
 
 
     public void register(RegisterRequest request) {
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        String hashedPassword = passwordEncoder.encode(request.password());
 
         User user = new User(
-                request.getEmail(),
+                request.email(),
                 hashedPassword,
                 Role.USER
         );
@@ -53,7 +53,7 @@ public class AuthService {
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException("Email already registered");
         }
-        log.info("User registered: email={}", request.getEmail());
+        log.info("User registered: email={}", request.email());
     }
 
     public void logout(String jti) {
@@ -66,11 +66,11 @@ public class AuthService {
     public String login(LoginRequest request){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(), request.getPassword()
+                        request.email(), request.password()
                 )
         );
-        log.info("Login successful: email={}", request.getEmail());
-        return jwtUtil.generateToken(request.email);
+        log.info("Login successful: email={}", request.password());
+        return jwtUtil.generateToken(request.email());
     }
 
 }
