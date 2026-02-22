@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update   # or validate/migrate later
+      ddl-auto: validate
     show-sql: false
 
 server:
