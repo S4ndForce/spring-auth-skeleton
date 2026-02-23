@@ -2,7 +2,6 @@ package com.example.note;
 
 import com.example.auth.OwnerAction;
 import com.example.auth.OwnerAuthorization;
-import com.example.exceptions.ForbiddenException;
 import com.example.exceptions.NotFoundException;
 import com.example.folder.Folder;
 import com.example.folder.FolderRepository;
@@ -21,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -68,7 +66,8 @@ public class NoteService {
         return Specification
                 .allOf(NoteSpecs.withId(id))
                 .and(NoteSpecs.belongsTo(user))
-                .and(NoteSpecs.folderNotDeleted());
+                .and(NoteSpecs.folderNotDeleted())
+                .and(NoteSpecs.isDeleted());
 
     }
     private Specification<Note> ownedActiveInFolder(Long folderId, User user) {

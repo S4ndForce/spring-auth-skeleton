@@ -35,8 +35,8 @@ public class FolderService {
     private Specification<Folder> ownedDeletedFolder(Long id, User user) {
         return Specification.
                 allOf(FolderSpecs.withId(id))
-                .and(FolderSpecs.belongsTo(user));
-        // intentionally omits notDeleted() - targets soft-deleted folders only
+                .and(FolderSpecs.belongsTo(user))
+                .and(FolderSpecs.isDeleted());
     }
 
     private Specification<Folder> allActive(User user) {
