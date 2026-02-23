@@ -228,8 +228,9 @@ public class NoteService {
     }
 
     public PageResponse<NoteResponse> getAllShared(Pageable pageable, Authentication auth){
-        Specification<Note> spec = Specification.allOf(NoteSpecs.hasSharedLinks());
-        Page<Note> sharedNotes = noteRepository.findAll(spec, pageable);
+        User user = currentUser.get(auth);
+        Specification<Note> spec = allActive(user);
+        Page<Note> sharedNotes = noteRepository.findAll(spec.and(NoteSpecs.hasSharedLinks()), pageable);
 
         ownedAuth.authorize(OwnerAction.READ);
         var content = sharedNotes.map(NoteResponse::fromEntity).toList();

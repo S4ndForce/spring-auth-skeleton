@@ -69,7 +69,7 @@ public class AuthService {
                         request.email(), request.password()
                 )
         );
-        log.info("Login successful: email={}", request.password());
+        log.info("Login successful: email={}", request.email());
         return jwtUtil.generateToken(request.email());
     }
 
